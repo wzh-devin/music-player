@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constrainLayout"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -13,37 +13,46 @@
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="222dp"
-        android:layout_height="222dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="88dp"
+        android:layout_width="322dp"
+        android:layout_height="322dp"
+        android:layout_marginTop="68dp"
+        android:contentDescription="TODO"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/picture" />
 
     <TextView
         android:id="@+id/tv_songName"
-        android:layout_width="215dp"
-        android:layout_height="69dp"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="328dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="356dp"
         android:text="Song Name"
         android:textColor="@color/black"
         android:textSize="40sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.231" />
 
     <TextView
         android:id="@+id/tv_singer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="176dp"
-        android:layout_marginTop="404dp"
+        android:layout_marginTop="428dp"
         android:text="Singer"
         android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.148" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -56,31 +65,89 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.822" />
+        app:layout_constraintVertical_bias="0.779" />
+
+    <TextView
+        android:id="@+id/tv_seekBarHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="00:00"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.043"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+
+    <TextView
+        android:id="@+id/tv_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="4:59"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.927"
+        app:layout_constraintStart_toEndOf="@+id/tv_seekBarHint"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+
+    <ImageButton
+        android:id="@+id/btn_recording"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="14dp"
+        android:background="@color/white"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintStart_toEndOf="@+id/btn_musicType"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/recording" />
+
+    <ImageButton
+        android:id="@+id/btn_talking"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="14dp"
+        android:background="@color/white"
+        android:contentDescription="TODO"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintEnd_toStartOf="@+id/btn_download"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/talking" />
+
+    <ImageButton
+        android:id="@+id/btn_download"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="492dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="14dp"
+        android:background="@color/white"
+        android:contentDescription="TODO"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/download" />
 
     <ImageButton
         android:id="@+id/btn_musicType"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="524dp"
+        android:layout_marginBottom="14dp"
         android:background="@color/white"
         android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/musicType" />
-
-    <ImageButton
-        android:id="@+id/download"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
-        android:layout_marginTop="524dp"
-        android:layout_marginEnd="24dp"
-        android:background="@color/white"
-        android:scaleType="fitCenter"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/download" />
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/music_type" />
 
     <ImageButton
         android:id="@+id/btn_play"
@@ -88,6 +155,7 @@
         android:layout_height="70dp"
         android:layout_marginBottom="36dp"
         android:background="@color/white"
+        android:contentDescription="TODO"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,34 +167,41 @@
         android:id="@+id/btn_playList"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginTop="43dp"
         android:background="@color/white"
+        android:contentDescription="TODO"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.566"
         app:layout_constraintStart_toEndOf="@+id/btn_next"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/list" />
 
     <ImageButton
         android:id="@+id/btn_playWay"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_marginBottom="44dp"
+        android:layout_marginTop="43dp"
         android:background="@color/white"
+        android:contentDescription="TODO"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_pre"
         app:layout_constraintHorizontal_bias="0.38"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/order" />
 
     <ImageButton
         android:id="@+id/btn_next"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="48dp"
         android:background="@color/white"
+        android:contentDescription="TODO"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -136,39 +211,15 @@
 
     <ImageButton
         android:id="@+id/btn_pre"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="48dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="44dp"
         android:background="@color/white"
+        android:contentDescription="TODO"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_play"
         app:srcCompat="@drawable/pre" />
-
-    <ImageButton
-        android:id="@+id/btn_recording"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="524dp"
-        android:background="@color/white"
-        android:scaleType="fitCenter"
-        app:layout_constraintStart_toEndOf="@+id/btn_musicType"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/recording" />
-
-    <ImageButton
-        android:id="@+id/btn_talking"
-        android:layout_width="@string/base_size"
-        android:layout_height="@string/base_size"
-        android:layout_marginTop="524dp"
-        android:layout_marginEnd="44dp"
-        android:background="@color/white"
-        android:scaleType="fitCenter"
-        app:layout_constraintEnd_toStartOf="@+id/download"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/talking" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
