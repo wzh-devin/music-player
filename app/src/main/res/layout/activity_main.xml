@@ -7,10 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- CD图片 -->
-
-    <!-- Song Name -->
-
     <ImageView
         android:id="@+id/picture"
         android:layout_width="322dp"
