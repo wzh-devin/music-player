@@ -1,24 +1,32 @@
 package com.devin.music_player;
 
-import android.os.Bundle;
+import android.annotation.SuppressLint;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+    private ActionBar actionBar;
+    private SeekBar seekBar;
+    private static final Map<String, TextView> textViewMap = new HashMap<>();
+    private static final Map<String, ImageButton> imageButtonMap = new HashMap<>();
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+
+    // 数据初始化
+    @SuppressLint("ClickableViewAccessibility")
+    public void initView() {
+        textViewMap.put("tvSongName", (TextView) findViewById(R.id.tv_songName));
+        textViewMap.put("tvSinger", (TextView) findViewById(R.id.tv_singer));
+
     }
 }

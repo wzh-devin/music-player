@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">music_player</string>
+    <string name="base_size">50dp</string>
 </resources>
