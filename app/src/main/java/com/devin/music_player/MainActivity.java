@@ -175,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
         public void onStopTrackingTouch(SeekBar seekBar) {
             Log.i("onStopTrackingTouch=================>", "seekBar: " + seekBar);
             ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
-            updateSongName(musicService.getCurrentSongName());
             musicService.play();
         }
     };
