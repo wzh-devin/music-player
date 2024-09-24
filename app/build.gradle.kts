@@ -11,7 +11,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,17 +29,27 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    android.applicationVariants.all {
+        outputs.all {
+            if (this is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                val config = project.android.defaultConfig
+                val versionName = config.versionName
+                val name = "musicplayer"
+                this.outputFileName = "android-${name}-${versionName}.apk"
+            }
+        }
+    }
 }
 
 dependencies {
 
     // lombok
-    implementation("org.projectlombok:lombok:1.18.24")
+    implementation(libs.lombok)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation("com.google.android.exoplayer:exoplayer:2.18.1") // 根据需要选择最新版本
+    implementation(libs.exoplayer) // 根据需要选择最新版本
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
