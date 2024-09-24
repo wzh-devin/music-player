@@ -115,6 +115,15 @@ public class MusicService extends Service {
     }
 
     /**
+     * 跳转进度
+     * @param progress
+     */
+    public void seekTo(int progress) {
+        Optional.ofNullable(player)
+                .ifPresent(p -> player.seekTo(progress));
+    }
+
+    /**
      * 获取本地服务
      */
     public class LocalBinder extends Binder {
