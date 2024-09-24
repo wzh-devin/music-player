@@ -250,22 +250,15 @@ public class MainActivity extends AppCompatActivity {
             timer.schedule(new ProgressUpdate(), 0, 1000);
 
             // 播放音乐
-//            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName()))
-//                    .ifPresent(v -> {
-//                        Log.i("imageButton:::::::::::", v + "");
-//                        v.setImageResource(R.drawable.stop);
-//                        musicService.play();
-//                        // 更新歌曲名
-//                        String songName = musicService.getCurrentSongName();
-//                        updateSongName(songName);
-//                    });
-            ImageButton play = imageButtonMap.get(BTN_PLAY.getViewName());
-            if (play != null) {
-                play.setImageResource(R.drawable.stop);
-                musicService.play();
-                String songName = musicService.getCurrentSongName();
-                updateSongName(songName);
-            }
+            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName()))
+                    .ifPresent(v -> {
+                        Log.i("imageButton:::::::::::", v + "");
+                        v.setImageResource(R.drawable.stop);
+                        musicService.play();
+                        // 更新歌曲名
+                        String songName = musicService.getCurrentSongName();
+                        updateSongName(songName);
+                    });
         }
     }
 
