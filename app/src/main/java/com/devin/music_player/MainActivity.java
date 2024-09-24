@@ -20,6 +20,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,8 +31,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
     private SeekBar seekBar;
+    private ConstraintLayout layout;
     private static final Map<String, TextView> textViewMap = new HashMap<>();
     private static final Map<String, ImageButton> imageButtonMap = new HashMap<>();
     private ListView listView;
@@ -97,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         }
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         listView = (ListView) findViewById(R.id.lv_music);
+        layout = (ConstraintLayout) findViewById(R.id.main);
 
         // 设置监听器
         imageButtonMap.forEach((viewName, imageButton) -> {
@@ -105,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 为进度条添加改变监听
         seekBar.setOnSeekBarChangeListener(seekChangedBarListener);
+
+        // 设置触摸监听
+        layout.setOnTouchListener(layoutOnTouchListener);
     }
 
     // 设置按钮点击的监听效果
@@ -114,20 +123,20 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
 //            Intent intent = new Intent(MainActivity.this, MusicService.class);
             Log.i("viewId>>>>>>>>>>>>>>>>>", "" + view.getId());
-            if (view.getId() == BTN_PLAYLIST.getViewId()) {
-                showMusicList();
-            } else if (view.getId() == BTN_PLAY.getViewId()) {
-                playOrPauseMusic();
-            } else if (view.getId() == BTN_NEXT.getViewId()) {
-                playNextMusic();
-            } else if (view.getId() == BTN_PRE.getViewId()) {
-                playPreMusic();
-            } else if (view.getId() == BTN_PLAY_WAY.getViewId()) {
-                changePlayMode();
+            switch (Objects.requireNonNull(ViewEnums.fromViewId(view.getId()))) {
+                case BTN_PLAYLIST -> showMusicList();
+                case BTN_PLAY -> playOrPauseMusic();
+                case BTN_NEXT -> playNextMusic();
+                case BTN_PRE -> playPreMusic();
+                case BTN_PLAY_WAY -> changePlayMode();
+                default -> {
+                    Toast.makeText(MainActivity.this, "暂未实现", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
 
+    // 列表音乐点击监听
     private final AdapterView.OnItemClickListener musicListListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -173,6 +182,27 @@ public class MainActivity extends AppCompatActivity {
             setOptionalValue(BTN_PLAY, R.drawable.stop);
             updateSongName(musicService.getCurrentSongName());
             musicService.play();
+        }
+    };
+
+    // 触摸监听
+    private final View.OnTouchListener layoutOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            // 获取 ListView 的位置信息
+            int[] listViewLocation = new int[2];
+            listView.getLocationOnScreen(listViewLocation);
+
+            // 判断触摸事件的坐标是否在 ListView 区域内
+            if (event.getRawX() < listViewLocation[0] ||
+                    event.getRawX() > listViewLocation[0] + listView.getWidth() ||
+                    event.getRawY() < listViewLocation[1] ||
+                    event.getRawY() > listViewLocation[1] + listView.getHeight()) {
+                // 如果触摸事件不在 ListView 区域内，则隐藏 ListView
+                listView.setVisibility(View.GONE);
+                return true; // 表示触摸事件已经被处理
+            }
+            return false; // 表示触摸事件未被处理
         }
     };
 
@@ -387,4 +417,27 @@ public class MainActivity extends AppCompatActivity {
         return sdf.format(param);
     }
 
+    /**
+     * 返回home桌面
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 销毁对象
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(serviceConnection);
+        musicService.onDestroy();
+    }
 }
