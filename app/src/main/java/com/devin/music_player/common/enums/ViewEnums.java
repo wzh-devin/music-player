@@ -2,9 +2,6 @@ package com.devin.music_player.common.enums;
 
 import com.devin.music_player.R;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * <p></p>
  *

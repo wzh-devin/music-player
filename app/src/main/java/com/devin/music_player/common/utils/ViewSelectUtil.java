@@ -4,6 +4,8 @@ import static com.devin.music_player.common.enums.ViewTypeEnums.IMAGE_BUTTON;
 import static com.devin.music_player.common.enums.ViewTypeEnums.TEXT_VIEW;
 
 import android.annotation.SuppressLint;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -52,5 +54,19 @@ public class ViewSelectUtil {
     private static String format(long param) {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("mm:ss"); // "分:秒"格式
         return sdf.format(param);
+    }
+
+    /**
+     * 设置字体样式
+     */
+    public static void setFontStyle(AssetManager assets) {
+        if (Objects.isNull(assets) || textViewMap.isEmpty()) {
+            return;
+        }
+        Typeface tf = Typeface.createFromAsset(assets, "fonts/YeZi.ttf");
+        // 加载字体
+        textViewMap.forEach((viewName, view) -> {
+            view.setTypeface(tf);
+        });
     }
 }

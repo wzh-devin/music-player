@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -35,6 +36,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.devin.music_player.common.adapter.MusicListAdapter;
 import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
 import com.devin.music_player.common.utils.ViewSelectUtil;
@@ -96,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
                 imageButtonMap.put(view.getViewName(), (ImageButton) findViewById(getResources().getIdentifier(view.getViewName(), "id", getPackageName())));
             }
         }
+
+        // 为文本设置字体
+        ViewSelectUtil.setFontStyle(getAssets());
+
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         listView = (ListView) findViewById(R.id.lv_music);
         layout = (ConstraintLayout) findViewById(R.id.main);
@@ -229,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 创建适配器
         adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice, musicList);
+//        adapter = new MusicListAdapter(MainActivity.this, android.R.layout.simple_list_item_single_choice, musicList);
         // 设置适配器
         listView.setAdapter(adapter);
         // 设置选择模式
