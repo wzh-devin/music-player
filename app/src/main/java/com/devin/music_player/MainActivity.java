@@ -1,15 +1,14 @@
 package com.devin.music_player;
 
-import static com.devin.music_player.common.enums.ViewEnums.BTN_NEXT;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY;
-import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAYLIST;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY_WAY;
-import static com.devin.music_player.common.enums.ViewEnums.BTN_PRE;
 import static com.devin.music_player.common.enums.ViewEnums.TV_DURATION;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SEEK_BAR_HINT;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SONG_NAME;
 import static com.devin.music_player.common.enums.ViewTypeEnums.IMAGE_BUTTON;
 import static com.devin.music_player.common.enums.ViewTypeEnums.TEXT_VIEW;
+import static com.devin.music_player.common.utils.ViewSelectUtil.imageButtonMap;
+import static com.devin.music_player.common.utils.ViewSelectUtil.textViewMap;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -38,16 +37,14 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
+import com.devin.music_player.common.utils.ViewSelectUtil;
 import com.devin.music_player.service.MusicService;
 import com.google.android.exoplayer2.Player;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
@@ -58,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private ActionBar actionBar;
     private SeekBar seekBar;
     private ConstraintLayout layout;
-    private static final Map<String, TextView> textViewMap = new HashMap<>();
-    private static final Map<String, ImageButton> imageButtonMap = new HashMap<>();
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private List<String> musicList = new ArrayList<>();
@@ -165,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             if (fromUser) {
                 timer = new Timer();
                 timer.schedule(new ProgressUpdate(), 0, 1000);
-                setOptionalValue(TV_SEEK_BAR_HINT, progress);
+                ViewSelectUtil.setOptionalValue(TV_SEEK_BAR_HINT, progress);
                 musicService.seekTo(progress);
             }
         }
@@ -173,13 +168,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             Log.i("onStartTrackingTouch=================>", "seekBar: " + seekBar);
-            setOptionalValue(BTN_PLAY, R.drawable.play);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.play);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             Log.i("onStopTrackingTouch=================>", "seekBar: " + seekBar);
-            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
             updateSongName(musicService.getCurrentSongName());
             musicService.play();
         }
@@ -264,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
             timer = new Timer();
             timer.schedule(new ProgressUpdate(), 0, 1000);
             musicService.playMusic(musicName);
-            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
         }
     }
 
@@ -317,9 +312,9 @@ public class MainActivity extends AppCompatActivity {
         if (isServiceBound && musicService != null) {
             timer = new Timer();
             timer.schedule(new ProgressUpdate(), 0, 1000);
-            setOptionalValue(BTN_PLAY, R.drawable.play);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.play);
             type.switchMusic(musicService);
-            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
             updateSongName(musicService.getCurrentSongName());
         }
     }
@@ -334,12 +329,12 @@ public class MainActivity extends AppCompatActivity {
                 case Player.REPEAT_MODE_ALL -> {
                     // 切换到单曲循环
                     musicService.setPlayMode(Player.REPEAT_MODE_ONE);
-                    setOptionalValue(BTN_PLAY_WAY, R.drawable.order);
+                    ViewSelectUtil.setOptionalValue(BTN_PLAY_WAY, R.drawable.order);
                 }
                 case Player.REPEAT_MODE_ONE -> {
                     // 切换到顺序播放
                     musicService.setPlayMode(Player.REPEAT_MODE_ALL);
-                    setOptionalValue(BTN_PLAY_WAY, R.drawable.random);
+                    ViewSelectUtil.setOptionalValue(BTN_PLAY_WAY, R.drawable.random);
                 }
                 default -> {
                 }
@@ -355,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateSongName(String songName) {
         // 去掉文件名后缀
         songName = songName.substring(0, songName.lastIndexOf("."));
-        setOptionalValue(TV_SONG_NAME, songName);
+        ViewSelectUtil.setOptionalValue(TV_SONG_NAME, songName);
     }
 
     // 更新音乐播放进度
@@ -368,53 +363,15 @@ public class MainActivity extends AppCompatActivity {
                 long duration = musicService.getDuration();
 
                 // 更新文本进度
-                setOptionalValue(TV_SEEK_BAR_HINT, position);
+                ViewSelectUtil.setOptionalValue(TV_SEEK_BAR_HINT, position);
                 // 更新文本总时长进度
-                setOptionalValue(TV_DURATION, duration);
+                ViewSelectUtil.setOptionalValue(TV_DURATION, duration);
 
                 // 更新进度条
                 seekBar.setMax((int) duration);
                 seekBar.setProgress((int) position);
             });
         }
-    }
-
-    /**
-     * TODO 设置文本内容（后续抽取为工具类）
-     *
-     * @param view
-     * @param type
-     * @param <T>
-     */
-    private <T> void setOptionalValue(ViewEnums view, T type) {
-        View vi = null;
-        if (Objects.equals(view.getViewType(), TEXT_VIEW.getCode())) {
-            vi = textViewMap.get(view.getViewName());
-        } else if (Objects.equals(view.getViewType(), IMAGE_BUTTON.getCode())) {
-            vi = imageButtonMap.get(view.getViewName());
-        }
-        Optional.ofNullable(vi).ifPresent(v -> {
-            if (v instanceof TextView) {
-                if (type instanceof Long) {
-                    ((TextView) v).setText(format((Long) type));
-                } else if (type instanceof String) {
-                    ((TextView) v).setText((String) type);
-                }
-            } else {
-                ((ImageButton) v).setImageResource((Integer) type);
-            }
-        });
-    }
-
-    /**
-     * TODO 格式化（后续简单抽取为工具类）
-     *
-     * @param param
-     * @return
-     */
-    private String format(long param) {
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("mm:ss"); // "分:秒"格式
-        return sdf.format(param);
     }
 
     /**
