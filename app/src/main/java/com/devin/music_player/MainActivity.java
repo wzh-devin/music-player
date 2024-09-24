@@ -12,7 +12,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private MusicService musicService;
     private boolean isServiceBound = false;
     private Timer timer;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +84,9 @@ public class MainActivity extends AppCompatActivity {
     public void initView() {
         for (ViewEnums view : ViewEnums.values()) {
             if (view.getViewType().equals(TEXT_VIEW.getCode())) {
-                textViewMap.put(view.getViewName(), (TextView) findViewById(getResources()
-                        .getIdentifier(view.getViewName(), "id", getPackageName())));
+                textViewMap.put(view.getViewName(), (TextView) findViewById(getResources().getIdentifier(view.getViewName(), "id", getPackageName())));
             } else if (view.getViewType().equals(IMAGE_BUTTON.getCode())) {
-                imageButtonMap.put(view.getViewName(), (ImageButton) findViewById(getResources()
-                        .getIdentifier(view.getViewName(), "id", getPackageName())));
+                imageButtonMap.put(view.getViewName(), (ImageButton) findViewById(getResources().getIdentifier(view.getViewName(), "id", getPackageName())));
             }
         }
         seekBar = (SeekBar) findViewById(R.id.seekBar);
@@ -93,8 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 设置监听器
         imageButtonMap.forEach((viewName, imageButton) -> {
-            Optional.ofNullable(imageButtonMap.get(viewName))
-                    .ifPresent(v -> v.setOnClickListener(listener));
+            Optional.ofNullable(imageButtonMap.get(viewName)).ifPresent(v -> v.setOnClickListener(listener));
         });
     }
 
@@ -118,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private final AdapterView.OnItemClickListener musicListListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            Log.i("onItemClick============>>>>",
-                    adapterView.toString() + "---->view: " + view.toString() + "---->i: " + position + "---->l: " + l);
+            Log.i("onItemClick============>>>>", adapterView.toString() + "---->view: " + view.toString() + "---->i: " + position + "---->l: " + l);
 
             ListView lv = (ListView) adapterView;
             lv.setSelector(R.color.blue);
@@ -159,11 +158,7 @@ public class MainActivity extends AppCompatActivity {
         // 获取播放列表
         musicList = getMusic();
         // 创建适配器
-        adapter = new ArrayAdapter<String>(
-                MainActivity.this,
-                android.R.layout.simple_list_item_single_choice,
-                musicList
-        );
+        adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice, musicList);
         // 设置适配器
         listView.setAdapter(adapter);
         // 设置选择模式
@@ -209,11 +204,10 @@ public class MainActivity extends AppCompatActivity {
     private void playOrPauseMusic() {
         if (musicService.isPlaying()) {
             // 暂停音乐
-            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName()))
-                    .ifPresent(v -> {
-                        v.setImageResource(R.drawable.play);
-                        musicService.pause();
-                    });
+            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName())).ifPresent(v -> {
+                v.setImageResource(R.drawable.play);
+                musicService.pause();
+            });
         } else {
             // 创建Timer对象，监听音乐播放进度
             Timer timer = new Timer();
@@ -255,17 +249,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            long position = musicService.getContentPosition();
-            long duration = musicService.getDuration();
+            mainHandler.post(() -> {
+                long position = musicService.getContentPosition();
+                long duration = musicService.getDuration();
 
-            // 更新文本进度
-            setOptionalValue(TV_SEEK_BAR_HINT, position);
-            // 更新文本总时长进度
-            setOptionalValue(TV_DURATION, duration);
+                // 更新文本进度
+                setOptionalValue(TV_SEEK_BAR_HINT, position);
+                // 更新文本总时长进度
+                setOptionalValue(TV_DURATION, duration);
 
-            // 更新进度条
-            seekBar.setMax((int) duration);
-            seekBar.setProgress((int) position);
+                // 更新进度条
+                seekBar.setMax((int) duration);
+                seekBar.setProgress((int) position);
+            });
         }
     }
 
@@ -283,18 +279,17 @@ public class MainActivity extends AppCompatActivity {
         } else if (Objects.equals(view.getViewType(), IMAGE_BUTTON.getCode())) {
             vi = imageButtonMap.get(view.getViewName());
         }
-        Optional.ofNullable(vi)
-                .ifPresent(v -> {
-                    if (v instanceof TextView) {
-                        if (type instanceof Long) {
-                            ((TextView) v).setText(format((Long) type));
-                        } else if (type instanceof String) {
-                            ((TextView) v).setText((String) type);
-                        }
-                    } else {
-                        ((ImageButton) v).setImageResource((Integer) type);
-                    }
-                });
+        Optional.ofNullable(vi).ifPresent(v -> {
+            if (v instanceof TextView) {
+                if (type instanceof Long) {
+                    ((TextView) v).setText(format((Long) type));
+                } else if (type instanceof String) {
+                    ((TextView) v).setText((String) type);
+                }
+            } else {
+                ((ImageButton) v).setImageResource((Integer) type);
+            }
+        });
     }
 
     /**

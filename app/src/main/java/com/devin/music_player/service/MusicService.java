@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -31,6 +33,7 @@ public class MusicService extends Service {
     private ExoPlayer player;
     private final List<MediaItem> mediaItems = new ArrayList<>();
     private int currentTrackIndex = 0;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
      * 初始化数据
@@ -97,6 +100,7 @@ public class MusicService extends Service {
         return "";
     }
 
+
     /**
      * 获取文件名
      *
@@ -151,8 +155,17 @@ public class MusicService extends Service {
      *
      * @return 当前播放进度
      */
+//    public long getContentPosition() {
+//        return mainHandler.post(() -> {
+//            Optional.ofNullable(player).map(Player::getContentPosition).orElse(0L);
+//        });
+//    }
+
     public long getContentPosition() {
-        return Optional.ofNullable(player).map(Player::getContentPosition).orElse(0L);
+        if (player != null) {
+            return mainHandler.post(() -> player.getContentPosition()) ? player.getContentPosition() : 0;
+        }
+        return 0;
     }
 
     /**
@@ -160,8 +173,14 @@ public class MusicService extends Service {
      *
      * @return 歌曲总时长
      */
+//    public long getDuration() {
+//        return Optional.ofNullable(player).map(Player::getDuration).orElse(0L);
+//    }
     public long getDuration() {
-        return Optional.ofNullable(player).map(Player::getDuration).orElse(0L);
+        if (player != null) {
+            return mainHandler.post(() -> player.getDuration()) ? player.getDuration() : 0;
+        }
+        return 0;
     }
 
     /**
