@@ -1,11 +1,14 @@
 package com.devin.music_player;
 
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY;
+import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY_WAY;
 import static com.devin.music_player.common.enums.ViewEnums.TV_DURATION;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SEEK_BAR_HINT;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SONG_NAME;
 import static com.devin.music_player.common.enums.ViewTypeEnums.IMAGE_BUTTON;
 import static com.devin.music_player.common.enums.ViewTypeEnums.TEXT_VIEW;
+import static com.devin.music_player.common.utils.ViewSelectUtil.imageButtonMap;
+import static com.devin.music_player.common.utils.ViewSelectUtil.textViewMap;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -16,6 +19,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,30 +30,32 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
+import com.devin.music_player.common.utils.ViewSelectUtil;
 import com.devin.music_player.service.MusicService;
+import com.google.android.exoplayer2.Player;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
     private SeekBar seekBar;
-    private static final Map<String, TextView> textViewMap = new HashMap<>();
-    private static final Map<String, ImageButton> imageButtonMap = new HashMap<>();
+    private ConstraintLayout layout;
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private List<String> musicList = new ArrayList<>();
@@ -91,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         listView = (ListView) findViewById(R.id.lv_music);
+        layout = (ConstraintLayout) findViewById(R.id.main);
 
         // 设置监听器
         imageButtonMap.forEach((viewName, imageButton) -> {
@@ -99,25 +107,32 @@ public class MainActivity extends AppCompatActivity {
 
         // 为进度条添加改变监听
         seekBar.setOnSeekBarChangeListener(seekChangedBarListener);
+
+        // 设置触摸监听
+        layout.setOnTouchListener(layoutOnTouchListener);
     }
 
-    // 设置监听效果
+    // 设置按钮点击的监听效果
     private final View.OnClickListener listener = new View.OnClickListener() {
         @SuppressLint({"ShowToast", "NonConstantResourceId"})
         @Override
         public void onClick(View view) {
 //            Intent intent = new Intent(MainActivity.this, MusicService.class);
             Log.i("viewId>>>>>>>>>>>>>>>>>", "" + view.getId());
-            if (view.getId() == ViewEnums.BTN_PLAYLIST.getViewId()) {
-                showMusicList();
-            } else if (view.getId() == BTN_PLAY.getViewId()) {
-                playOrPauseMusic();
-            } else {
-                Toast.makeText(MainActivity.this, "未实现", Toast.LENGTH_SHORT);
+            switch (Objects.requireNonNull(ViewEnums.fromViewId(view.getId()))) {
+                case BTN_PLAYLIST -> showMusicList();
+                case BTN_PLAY -> playOrPauseMusic();
+                case BTN_NEXT -> playNextMusic();
+                case BTN_PRE -> playPreMusic();
+                case BTN_PLAY_WAY -> changePlayMode();
+                default -> {
+                    Toast.makeText(MainActivity.this, "暂未实现", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
 
+    // 列表音乐点击监听
     private final AdapterView.OnItemClickListener musicListListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -146,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             if (fromUser) {
                 timer = new Timer();
                 timer.schedule(new ProgressUpdate(), 0, 1000);
-                setOptionalValue(TV_SEEK_BAR_HINT, progress);
+                ViewSelectUtil.setOptionalValue(TV_SEEK_BAR_HINT, progress);
                 musicService.seekTo(progress);
             }
         }
@@ -154,15 +169,35 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             Log.i("onStartTrackingTouch=================>", "seekBar: " + seekBar);
-            setOptionalValue(BTN_PLAY, R.drawable.play);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.play);
         }
-// 手动
+
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             Log.i("onStopTrackingTouch=================>", "seekBar: " + seekBar);
-            setOptionalValue(BTN_PLAY, R.drawable.stop);
-            updateSongName(musicService.getCurrentSongName());
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
             musicService.play();
+        }
+    };
+
+    // 触摸监听
+    private final View.OnTouchListener layoutOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            // 获取 ListView 的位置信息
+            int[] listViewLocation = new int[2];
+            listView.getLocationOnScreen(listViewLocation);
+
+            // 判断触摸事件的坐标是否在 ListView 区域内
+            if (event.getRawX() < listViewLocation[0] ||
+                    event.getRawX() > listViewLocation[0] + listView.getWidth() ||
+                    event.getRawY() < listViewLocation[1] ||
+                    event.getRawY() > listViewLocation[1] + listView.getHeight()) {
+                // 如果触摸事件不在 ListView 区域内，则隐藏 ListView
+                listView.setVisibility(View.GONE);
+                return true; // 表示触摸事件已经被处理
+            }
+            return false; // 表示触摸事件未被处理
         }
     };
 
@@ -187,6 +222,11 @@ public class MainActivity extends AppCompatActivity {
     private void showMusicList() {
         // 获取播放列表
         musicList = getMusic();
+        // 去除文件后缀
+        musicList = musicList.stream()
+                .map(music -> music.split("\\.")[0])
+                .collect(Collectors.toList());
+
         // 创建适配器
         adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice, musicList);
         // 设置适配器
@@ -224,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
             timer = new Timer();
             timer.schedule(new ProgressUpdate(), 0, 1000);
             musicService.playMusic(musicName);
-            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
         }
     }
 
@@ -244,21 +284,65 @@ public class MainActivity extends AppCompatActivity {
             timer.schedule(new ProgressUpdate(), 0, 1000);
 
             // 播放音乐
-//            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName()))
-//                    .ifPresent(v -> {
-//                        Log.i("imageButton:::::::::::", v + "");
-//                        v.setImageResource(R.drawable.stop);
-//                        musicService.play();
-//                        // 更新歌曲名
-//                        String songName = musicService.getCurrentSongName();
-//                        updateSongName(songName);
-//                    });
-            ImageButton play = imageButtonMap.get(BTN_PLAY.getViewName());
-            if (play != null) {
-                play.setImageResource(R.drawable.stop);
-                musicService.play();
-                String songName = musicService.getCurrentSongName();
-                updateSongName(songName);
+            Optional.ofNullable(imageButtonMap.get(BTN_PLAY.getViewName()))
+                    .ifPresent(v -> {
+                        Log.i("imageButton:::::::::::", v + "");
+                        v.setImageResource(R.drawable.stop);
+                        musicService.play();
+                        // 更新歌曲名
+                        String songName = musicService.getCurrentSongName();
+                        updateSongName(songName);
+                    });
+        }
+    }
+
+    /**
+     * 播放下一首
+     */
+    public void playNextMusic() {
+        switchMusic(SwitchType.NEXT);
+    }
+
+    /**
+     * 播放上一首
+     */
+    public void playPreMusic() {
+        switchMusic(SwitchType.PRE);
+    }
+
+    /**
+     * 切换音乐
+     */
+    private void switchMusic(SwitchType type) {
+        if (isServiceBound && musicService != null) {
+            timer = new Timer();
+            timer.schedule(new ProgressUpdate(), 0, 1000);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.play);
+            type.switchMusic(musicService);
+            ViewSelectUtil.setOptionalValue(BTN_PLAY, R.drawable.stop);
+            updateSongName(musicService.getCurrentSongName());
+        }
+    }
+
+    /**
+     * 切换播放方式
+     */
+    private void changePlayMode() {
+        if (!Objects.isNull(musicService)) {
+            Integer currentMode = musicService.getPlayMode();
+            switch (currentMode) {
+                case Player.REPEAT_MODE_ALL -> {
+                    // 切换到单曲循环
+                    musicService.setPlayMode(Player.REPEAT_MODE_ONE);
+                    ViewSelectUtil.setOptionalValue(BTN_PLAY_WAY, R.drawable.order);
+                }
+                case Player.REPEAT_MODE_ONE -> {
+                    // 切换到顺序播放
+                    musicService.setPlayMode(Player.REPEAT_MODE_ALL);
+                    ViewSelectUtil.setOptionalValue(BTN_PLAY_WAY, R.drawable.random);
+                }
+                default -> {
+                }
             }
         }
     }
@@ -270,8 +354,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateSongName(String songName) {
         // 去掉文件名后缀
-        songName = songName.substring(0, songName.lastIndexOf("."));
-        setOptionalValue(TV_SONG_NAME, songName);
+//        songName = songName.substring(0, songName.lastIndexOf("."));
+        ViewSelectUtil.setOptionalValue(TV_SONG_NAME, songName);
     }
 
     // 更新音乐播放进度
@@ -284,9 +368,9 @@ public class MainActivity extends AppCompatActivity {
                 long duration = musicService.getDuration();
 
                 // 更新文本进度
-                setOptionalValue(TV_SEEK_BAR_HINT, position);
+                ViewSelectUtil.setOptionalValue(TV_SEEK_BAR_HINT, position);
                 // 更新文本总时长进度
-                setOptionalValue(TV_DURATION, duration);
+                ViewSelectUtil.setOptionalValue(TV_DURATION, duration);
 
                 // 更新进度条
                 seekBar.setMax((int) duration);
@@ -296,41 +380,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 设置文本内容
+     * 返回home桌面
      *
-     * @param view
-     * @param type
-     * @param <T>
+     * @param item
+     * @return
      */
-    private <T> void setOptionalValue(ViewEnums view, T type) {
-        View vi = null;
-        if (Objects.equals(view.getViewType(), TEXT_VIEW.getCode())) {
-            vi = textViewMap.get(view.getViewName());
-        } else if (Objects.equals(view.getViewType(), IMAGE_BUTTON.getCode())) {
-            vi = imageButtonMap.get(view.getViewName());
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
         }
-        Optional.ofNullable(vi).ifPresent(v -> {
-            if (v instanceof TextView) {
-                if (type instanceof Long) {
-                    ((TextView) v).setText(format((Long) type));
-                } else if (type instanceof String) {
-                    ((TextView) v).setText((String) type);
-                }
-            } else {
-                ((ImageButton) v).setImageResource((Integer) type);
-            }
-        });
+        return super.onOptionsItemSelected(item);
     }
 
     /**
-     * 格式化
-     *
-     * @param param
-     * @return
+     * 销毁对象
      */
-    private String format(long param) {
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("mm:ss"); // "分:秒"格式
-        return sdf.format(param);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(serviceConnection);
+        musicService.onDestroy();
     }
-
 }

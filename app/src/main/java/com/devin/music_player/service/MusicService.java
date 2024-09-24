@@ -18,7 +18,10 @@ import com.google.android.exoplayer2.Player;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import lombok.Data;
 
 /**
  * <p></p>
@@ -33,6 +36,7 @@ public class MusicService extends Service {
     private ExoPlayer player;
     private final List<MediaItem> mediaItems = new ArrayList<>();
     private int currentTrackIndex = 0;
+    private Integer playMode = Player.REPEAT_MODE_ALL; // 默认为顺序播放
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
@@ -59,7 +63,7 @@ public class MusicService extends Service {
             // 添加音乐
             player.addMediaItems(mediaItems);
             // 顺序播放
-            player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
+            player.setRepeatMode(playMode);
             // 播放
             player.prepare();
         }
@@ -110,17 +114,65 @@ public class MusicService extends Service {
     private String getFileNameFromMediaItem(MediaItem mediaItem) {
         return Optional.ofNullable(mediaItem.playbackProperties)
                 .map(properties -> properties.uri)
-                .map(Uri::getLastPathSegment)
+                .map(uri -> {
+                    String segment = uri.getLastPathSegment();
+                    // 去除文件后缀
+                    return segment.substring(0, segment.lastIndexOf("."));
+                })
                 .orElse("");
     }
 
     /**
      * 跳转进度
+     *
      * @param progress
      */
     public void seekTo(int progress) {
         Optional.ofNullable(player)
                 .ifPresent(p -> player.seekTo(progress));
+    }
+
+    /**
+     * 播放下一首
+     */
+    public void playNextMusic() {
+        Optional.ofNullable(player)
+                .ifPresent(p -> {
+                    if (++currentTrackIndex >= mediaItems.size()) {
+                        currentTrackIndex = 0;
+                    }
+                    player.seekToDefaultPosition(currentTrackIndex);
+                    player.play();
+                });
+    }
+
+    /**
+     * 播放上一首
+     */
+    public void playPreMusic() {
+        Optional.ofNullable(player)
+                .ifPresent(p -> {
+                    if (--currentTrackIndex < 0) {
+                        currentTrackIndex = mediaItems.size() - 1;
+                    }
+                    player.seekToDefaultPosition(currentTrackIndex);
+                    player.play();
+                });
+    }
+
+    /**
+     * 获取播放模式
+     */
+    public Integer getPlayMode() {
+        return this.playMode;
+    }
+
+    /**
+     * 设置播放模式
+     */
+    public void setPlayMode(Integer mode) {
+        playMode = mode;
+        player.setRepeatMode(mode); // 更新播放模式
     }
 
     /**
@@ -169,7 +221,6 @@ public class MusicService extends Service {
 //            Optional.ofNullable(player).map(Player::getContentPosition).orElse(0L);
 //        });
 //    }
-
     public long getContentPosition() {
         if (player != null) {
             return mainHandler.post(() -> player.getContentPosition()) ? player.getContentPosition() : 0;

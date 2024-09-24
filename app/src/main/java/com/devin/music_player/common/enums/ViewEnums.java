@@ -13,8 +13,6 @@ import lombok.Getter;
  * @date 2024/9/22 21:44
  * @since 1.0
  */
-//@AllArgsConstructor
-//@Getter
 public enum ViewEnums {
 
     TV_SONG_NAME("tv_songName", "歌曲名", 0, R.id.tv_songName),
@@ -57,5 +55,14 @@ public enum ViewEnums {
 
     public Integer getViewId() {
         return viewId;
+    }
+
+    public static ViewEnums fromViewId(int viewId) {
+        for (ViewEnums viewEnum : values()) {
+            if (viewEnum.getViewId() == viewId) {
+                return viewEnum;
+            }
+        }
+        return null;
     }
 }
