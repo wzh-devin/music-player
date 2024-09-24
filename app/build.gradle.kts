@@ -42,14 +42,11 @@ android {
 }
 
 dependencies {
-
-    // lombok
-    implementation(libs.lombok)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.exoplayer) // 根据需要选择最新版本
+    implementation(libs.exoplayer)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

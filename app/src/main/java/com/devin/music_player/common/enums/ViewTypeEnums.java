@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>
@@ -18,8 +19,6 @@ import lombok.Getter;
  * @date 2024/9/22 23:26
  * @since 1.0
  */
-//@Getter
-//@AllArgsConstructor
 public enum ViewTypeEnums {
 
     TEXT_VIEW(0, TextView.class),
