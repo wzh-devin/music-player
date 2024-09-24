@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         imageButtonMap.forEach((viewName, imageButton) -> {
             Optional.ofNullable(imageButtonMap.get(viewName)).ifPresent(v -> v.setOnClickListener(listener));
         });
+
+        // 为进度条添加改变监听
+        seekBar.setOnSeekBarChangeListener(seekChangedBarListener);
     }
 
     // 设置监听效果
@@ -128,9 +131,38 @@ public class MainActivity extends AppCompatActivity {
                 // 获取ListView布局参数
                 listView.setVisibility(View.GONE);
             } else {
-                // TODO 播放音乐
                 playMusic(musicName);
             }
+        }
+    };
+
+    //  进度条改变事件监听
+    private final SeekBar.OnSeekBarChangeListener seekChangedBarListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            Log.i("onProgressChanged=================>", "seekBar: " + seekBar +
+                    "\n====>progress: " + progress +
+                    "\n====>fromUser: " + fromUser);
+            if (fromUser) {
+                timer = new Timer();
+                timer.schedule(new ProgressUpdate(), 0, 1000);
+                setOptionalValue(TV_SEEK_BAR_HINT, progress);
+                musicService.seekTo(progress);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            Log.i("onStartTrackingTouch=================>", "seekBar: " + seekBar);
+            setOptionalValue(BTN_PLAY, R.drawable.play);
+        }
+// 手动
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            Log.i("onStopTrackingTouch=================>", "seekBar: " + seekBar);
+            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            updateSongName(musicService.getCurrentSongName());
+            musicService.play();
         }
     };
 
@@ -138,9 +170,7 @@ public class MainActivity extends AppCompatActivity {
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-//            musicService = ((MusicService.LocalBinder) iBinder).getService();
-            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            musicService = binder.getService();
+            musicService = ((MusicService.LocalBinder) service).getService();
             isServiceBound = true;
         }
 
