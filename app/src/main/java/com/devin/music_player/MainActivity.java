@@ -3,6 +3,7 @@ package com.devin.music_player;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_NEXT;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAYLIST;
+import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY_WAY;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PRE;
 import static com.devin.music_player.common.enums.ViewEnums.TV_DURATION;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SEEK_BAR_HINT;
@@ -34,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
 import com.devin.music_player.service.MusicService;
+import com.google.android.exoplayer2.Player;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -120,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 playNextMusic();
             } else if (view.getId() == BTN_PRE.getViewId()) {
                 playPreMusic();
+            } else if (view.getId() == BTN_PLAY_WAY.getViewId()) {
+                changePlayMode();
             }
         }
     };
@@ -287,6 +291,29 @@ public class MainActivity extends AppCompatActivity {
             type.switchMusic(musicService);
             setOptionalValue(BTN_PLAY, R.drawable.stop);
             updateSongName(musicService.getCurrentSongName());
+        }
+    }
+
+    /**
+     * 切换播放方式
+     */
+    private void changePlayMode() {
+        if (!Objects.isNull(musicService)) {
+            Integer currentMode = musicService.getPlayMode();
+            switch(currentMode) {
+                case Player.REPEAT_MODE_ALL -> {
+                    // 切换到单曲循环
+                    musicService.setPlayMode(Player.REPEAT_MODE_ONE);
+                    setOptionalValue(BTN_PLAY_WAY, R.drawable.order);
+                }
+                case Player.REPEAT_MODE_ONE -> {
+                    // 切换到顺序播放
+                    musicService.setPlayMode(Player.REPEAT_MODE_ALL);
+                    setOptionalValue(BTN_PLAY_WAY, R.drawable.random);
+                }
+                default -> {
+                }
+            }
         }
     }
 

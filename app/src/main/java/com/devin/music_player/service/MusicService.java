@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.Data;
+
 /**
  * <p></p>
  *
@@ -33,6 +35,7 @@ public class MusicService extends Service {
     private ExoPlayer player;
     private final List<MediaItem> mediaItems = new ArrayList<>();
     private int currentTrackIndex = 0;
+    private Integer playMode = Player.REPEAT_MODE_ALL; // 默认为顺序播放
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
@@ -59,7 +62,7 @@ public class MusicService extends Service {
             // 添加音乐
             player.addMediaItems(mediaItems);
             // 顺序播放
-            player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
+            player.setRepeatMode(playMode);
             // 播放
             player.prepare();
         }
@@ -150,6 +153,21 @@ public class MusicService extends Service {
                     player.seekToDefaultPosition(currentTrackIndex);
                     player.play();
                 });
+    }
+
+    /**
+     * 获取播放模式
+     */
+    public Integer getPlayMode() {
+        return this.playMode;
+    }
+
+    /**
+     * 设置播放模式
+     */
+    public void setPlayMode(Integer mode) {
+        playMode = mode;
+        player.setRepeatMode(mode); // 更新播放模式
     }
 
     /**
