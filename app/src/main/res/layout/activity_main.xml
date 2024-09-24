@@ -8,25 +8,23 @@
     tools:context=".MainActivity"
     android:background="@drawable/bgc">
 
-    <ImageView
-        android:id="@+id/picture"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginTop="68dp"
-        android:contentDescription="TODO"
-        app:layout_constraintBottom_toTopOf="@+id/seekBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.004"
-        app:srcCompat="@drawable/picture" />
+<!--    <ImageView-->
+<!--        android:id="@+id/picture"-->
+<!--        android:layout_width="280dp"-->
+<!--        android:layout_height="280dp"-->
+<!--        android:layout_marginTop="68dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/seekBar"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.496"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.004"-->
+<!--        app:srcCompat="@drawable/picture" />-->
 
     <TextView
         android:id="@+id/tv_songName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="356dp"
         android:text="Song Name"
         android:textColor="@color/white"
         android:textSize="40sp"
@@ -36,21 +34,21 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.095" />
+        app:layout_constraintVertical_bias="0.471" />
 
     <TextView
         android:id="@+id/tv_singer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="428dp"
         android:text="Singer"
-        android:textSize="20sp"
         android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.711"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.148" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_songName"
+        app:layout_constraintVertical_bias="0.091" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -232,7 +230,6 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/picture" />
+        app:layout_constraintHorizontal_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

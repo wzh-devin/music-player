@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.Player;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.Data;
@@ -113,7 +114,11 @@ public class MusicService extends Service {
     private String getFileNameFromMediaItem(MediaItem mediaItem) {
         return Optional.ofNullable(mediaItem.playbackProperties)
                 .map(properties -> properties.uri)
-                .map(Uri::getLastPathSegment)
+                .map(uri -> {
+                    String segment = uri.getLastPathSegment();
+                    // 去除文件后缀
+                    return segment.substring(0, segment.lastIndexOf("."));
+                })
                 .orElse("");
     }
 

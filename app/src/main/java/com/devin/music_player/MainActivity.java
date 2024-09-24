@@ -49,6 +49,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -221,6 +222,11 @@ public class MainActivity extends AppCompatActivity {
     private void showMusicList() {
         // 获取播放列表
         musicList = getMusic();
+        // 去除文件后缀
+        musicList = musicList.stream()
+                .map(music -> music.split("\\.")[0])
+                .collect(Collectors.toList());
+
         // 创建适配器
         adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice, musicList);
         // 设置适配器
@@ -324,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
     private void changePlayMode() {
         if (!Objects.isNull(musicService)) {
             Integer currentMode = musicService.getPlayMode();
-            switch(currentMode) {
+            switch (currentMode) {
                 case Player.REPEAT_MODE_ALL -> {
                     // 切换到单曲循环
                     musicService.setPlayMode(Player.REPEAT_MODE_ONE);
@@ -348,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateSongName(String songName) {
         // 去掉文件名后缀
-        songName = songName.substring(0, songName.lastIndexOf("."));
+//        songName = songName.substring(0, songName.lastIndexOf("."));
         ViewSelectUtil.setOptionalValue(TV_SONG_NAME, songName);
     }
 
@@ -375,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 返回home桌面
+     *
      * @param item
      * @return
      */
