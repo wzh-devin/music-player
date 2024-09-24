@@ -116,11 +116,40 @@ public class MusicService extends Service {
 
     /**
      * 跳转进度
+     *
      * @param progress
      */
     public void seekTo(int progress) {
         Optional.ofNullable(player)
                 .ifPresent(p -> player.seekTo(progress));
+    }
+
+    /**
+     * 播放下一首
+     */
+    public void playNextMusic() {
+        Optional.ofNullable(player)
+                .ifPresent(p -> {
+                    if (++currentTrackIndex >= mediaItems.size()) {
+                        currentTrackIndex = 0;
+                    }
+                    player.seekToDefaultPosition(currentTrackIndex);
+                    player.play();
+                });
+    }
+
+    /**
+     * 播放上一首
+     */
+    public void playPreMusic() {
+        Optional.ofNullable(player)
+                .ifPresent(p -> {
+                    if (--currentTrackIndex < 0) {
+                        currentTrackIndex = mediaItems.size() - 1;
+                    }
+                    player.seekToDefaultPosition(currentTrackIndex);
+                    player.play();
+                });
     }
 
     /**
@@ -169,7 +198,6 @@ public class MusicService extends Service {
 //            Optional.ofNullable(player).map(Player::getContentPosition).orElse(0L);
 //        });
 //    }
-
     public long getContentPosition() {
         if (player != null) {
             return mainHandler.post(() -> player.getContentPosition()) ? player.getContentPosition() : 0;

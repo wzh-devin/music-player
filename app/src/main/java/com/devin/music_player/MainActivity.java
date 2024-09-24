@@ -1,6 +1,9 @@
 package com.devin.music_player;
 
+import static com.devin.music_player.common.enums.ViewEnums.BTN_NEXT;
 import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAY;
+import static com.devin.music_player.common.enums.ViewEnums.BTN_PLAYLIST;
+import static com.devin.music_player.common.enums.ViewEnums.BTN_PRE;
 import static com.devin.music_player.common.enums.ViewEnums.TV_DURATION;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SEEK_BAR_HINT;
 import static com.devin.music_player.common.enums.ViewEnums.TV_SONG_NAME;
@@ -28,6 +31,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.devin.music_player.common.enums.SwitchType;
 import com.devin.music_player.common.enums.ViewEnums;
 import com.devin.music_player.service.MusicService;
 
@@ -101,19 +105,21 @@ public class MainActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(seekChangedBarListener);
     }
 
-    // 设置监听效果
+    // 设置按钮点击的监听效果
     private final View.OnClickListener listener = new View.OnClickListener() {
         @SuppressLint({"ShowToast", "NonConstantResourceId"})
         @Override
         public void onClick(View view) {
 //            Intent intent = new Intent(MainActivity.this, MusicService.class);
             Log.i("viewId>>>>>>>>>>>>>>>>>", "" + view.getId());
-            if (view.getId() == ViewEnums.BTN_PLAYLIST.getViewId()) {
+            if (view.getId() == BTN_PLAYLIST.getViewId()) {
                 showMusicList();
             } else if (view.getId() == BTN_PLAY.getViewId()) {
                 playOrPauseMusic();
-            } else {
-                Toast.makeText(MainActivity.this, "未实现", Toast.LENGTH_SHORT);
+            } else if (view.getId() == BTN_NEXT.getViewId()) {
+                playNextMusic();
+            } else if (view.getId() == BTN_PRE.getViewId()) {
+                playPreMusic();
             }
         }
     };
@@ -156,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("onStartTrackingTouch=================>", "seekBar: " + seekBar);
             setOptionalValue(BTN_PLAY, R.drawable.play);
         }
-// 手动
+
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             Log.i("onStopTrackingTouch=================>", "seekBar: " + seekBar);
@@ -264,6 +270,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * 播放下一首
+     */
+    public void playNextMusic() {
+        switchMusic(SwitchType.NEXT);
+    }
+
+    /**
+     * 播放上一首
+     */
+    public void playPreMusic() {
+        switchMusic(SwitchType.PRE);
+    }
+
+    /**
+     * 切换音乐
+     */
+    private void switchMusic(SwitchType type) {
+        if (isServiceBound && musicService != null) {
+            timer = new Timer();
+            timer.schedule(new ProgressUpdate(), 0, 1000);
+            setOptionalValue(BTN_PLAY, R.drawable.play);
+            type.switchMusic(musicService);
+            setOptionalValue(BTN_PLAY, R.drawable.stop);
+            updateSongName(musicService.getCurrentSongName());
+        }
+    }
+
+    /**
      * 更新歌曲名
      *
      * @param songName
@@ -296,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 设置文本内容
+     * TODO 设置文本内容（后续抽取为工具类）
      *
      * @param view
      * @param type
@@ -323,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 格式化
+     * TODO 格式化（后续简单抽取为工具类）
      *
      * @param param
      * @return
